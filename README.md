@@ -9,6 +9,14 @@ entry point, the Xbox kernel/runtime bridge, the D3D8 abstraction, the memory
 layout, the crash diagnostics, and the build glue. The game's own x86 code is
 lifted to C on *your* machine from *your* copy of the game.
 
+## Targets
+
+**Windows** is the bring-up platform (complete D3D11 rendering path);
+**Android (arm64)** is the destination — a distributable engine the user points
+at their own copy of the game, like a native-port wrapper. The generated game
+code is identical on both; only the rendering/input/packaging backend changes.
+Full plan: [`docs/targets.md`](docs/targets.md).
+
 ## ⚖️ LEGAL — READ THIS FIRST
 
 * **This repository contains no game code, no game assets, and no copyrighted
