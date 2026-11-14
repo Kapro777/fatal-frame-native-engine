@@ -47,7 +47,46 @@ typedef void (*recomp_func_t)(void);
 /* ── Register state (defined in xbox_memory_layout.c) ──────── */
 
 extern uint32_t g_eax;
+extern uint32_t g_ecx;
+extern uint32_t g_edx;
+extern uint32_t g_esp;
 extern ptrdiff_t g_xbox_mem_offset;
+
+/* ── Bring-up instrumentation (Fatal Frame) ──────────────────
+ *
+ * Wrappers that log the return value of the game's boot-critical
+ * functions. Each calls the generated original through the dispatch
+ * table, then reports g_eax -- the ABI-level return value.
+ *
+ *   0x00011F00  the game's main loop object method (sub_000D7FA0 calls it)
+ *   0x00011DD0  XBApp-style platform/device init (D3D create, per-title)
+ *   0x000E8070  D3D8 lib CreateDevice wrapper
+ *   0x000EE900  D3D8 lib device allocation + NV2A bring-up
+ *   0x000D7FA0  main-thread trampoline: 11DD0 then 11F00
+ */
+
+extern void sub_00011F00(void);
+extern void sub_00011DD0(void);
+extern void sub_000E8070(void);
+extern void sub_000EE900(void);
+extern void sub_000D7FA0(void);
+
+#define WRAP_FUNC(name)                                        \
+    static void wrap_##name(void)                              \
+    {                                                          \
+        uint32_t esp_before = g_esp;                           \
+        name();                                                \
+        uint32_t ret = g_eax;                                  \
+        fprintf(stderr, "[MANUAL] %s -> 0x%08X (ecx=0x%08X edx=0x%08X esp 0x%08X->0x%08X)\n", \
+                #name, ret, g_ecx, g_edx, esp_before, g_esp);  \
+        fflush(stderr);                                        \
+    }
+
+WRAP_FUNC(sub_00011F00)
+WRAP_FUNC(sub_00011DD0)
+WRAP_FUNC(sub_000E8070)
+WRAP_FUNC(sub_000EE900)
+WRAP_FUNC(sub_000D7FA0)
 
 /* ── Manual function overrides ─────────────────────────────── */
 
@@ -87,13 +126,15 @@ extern ptrdiff_t g_xbox_mem_offset;
  */
 recomp_func_t recomp_lookup_manual(uint32_t xbox_va)
 {
-    /*
-     * TODO: Add your overrides here. Examples:
-     *
-     * if (xbox_va == 0x00012345) return traced_sub_00012345;
-     * if (xbox_va == 0x00067890) return stub_00067890;
-     * if (xbox_va == 0x000ABCDE) return fixed_sub_000ABCDE;
-     */
+    /* Fatal Frame bring-up instrumentation: log boot-critical return values. */
+    switch (xbox_va) {
+    case 0x00011F00: return wrap_sub_00011F00;
+    case 0x00011DD0: return wrap_sub_00011DD0;
+    case 0x000E8070: return wrap_sub_000E8070;
+    case 0x000EE900: return wrap_sub_000EE900;
+    case 0x000D7FA0: return wrap_sub_000D7FA0;
+    default: break;
+    }
 
     (void)xbox_va;
     return (recomp_func_t)0;
