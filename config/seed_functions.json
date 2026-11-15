@@ -4038,5 +4038,10 @@
   "start": "0x00154B57",
   "observed": true,
   "note": "unresolved call target found in generated C (round 3)"
+ },
+ {
+  "start": "0x000F4D74",
+  "observed": true,
+  "note": "runtime ICALL failure: asset-loading path, coverage gap in the D3D section"
  }
 ]
