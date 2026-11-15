@@ -119,3 +119,86 @@ next to the executable path.
 - Textures/models are proprietary `.pkx`/`.xpr`/`.sgd`; the game's own code
   parses them — no host loader needed for boot.
 - `DOLBY` section present: audio init may probe AC-3, watch for it.
+
+## 2026-11-15 (evening) — pushbuffer wait root cause + fix: PFIFO channel ack
+
+**Status**: device create hangs in the same pushbuffer wait, root cause now
+proven end-to-end against the on-disk XBE disassembly (not just probes).
+Fix implemented in the engine (thread `engine_pfifo_ack_thread`); see commit
+"PFIFO user-DMA ack".
+
+**Corrections to the earlier entry** (both matter):
+- `dev + 0x23BC` = `0x000F6F40 + 0x23BC` = **0x000F92FC** (the earlier
+  "0x000F91FC" was an arithmetic slip) and its value is **0x00800000 — a
+  valid channel pointer**, not garbage. The `0xE8500674` reading was the
+  wrong address entirely.
+- So the wait is *not* "GET read through a garbage pointer". Both pointers
+  are fine. What never happens is the GPU half of the handshake: nothing
+  advances the consumed position (GET).
+
+**The mechanism** (disassembly of `0x000EEC78..0x000EECD6` in the D3D
+section, file offset = VA − 0xE6B80 + 0xD7000):
+
+```asm
+  0x000EEC78: mov edx,[esi]              ; *esi saved onto the device
+  0x000EEC7A: mov eax,[esp+8]            ; dev = 0x000F6F40
+  0x000EEC7E: mov [eax+0x4fc],edx
+  0x000EEC88: mov edx,[esp+0xc]          ; channel object (0x00800000 here)
+  0x000EEC8C: mov [eax+0x23bc],edx        ; dev->channel = 0x00800000
+  0x000EECA2: mov edx,[eax+0x24]         ; 0x80002000 (ring write cursor)
+  0x000EECA5: and edx,0xfffffff          ; -> physical 0x2000
+  0x000EECAB: inc edx
+  0x000EECAC: mov [0x80000000],edx       ; *doorbell* kick (VA 0x80000000)
+  0x000EECB2: wbinvd
+  0x000EECB8: call 0x000EDA70            ; D3D flush (spins on the PFB
+                                          ; kick bit at 0xFD100410, which
+                                          ; the runtime's ack thread clears)
+  0x000EECBD: eax=[esp+8]; ecx=[eax+0x23bc]; ecx=[ecx+0x44]   ; GET
+  0x000EECCA: edx=[eax]                   ; PUT
+  0x000EECCC: xor/test 0xfffffff ; jne 0x000EECD6 (busy delay 0xED750)
+```
+
+**Verified runtime state at the hang** (one probe run, all addresses):
+`[0xF9B80]=0x000F6F40` (device global), `[0xF92FC]=0x00800000` (channel),
+`[0x800040]=0x00002000` (channel PUT), `[0x800044]=0x00000000` (channel GET),
+`[0xF6F40]=0x80002000` (device PUT), `[0x80000000]=0x00002001` (the kick that
+was already delivered). `dev->[0x2C0] = 0xFD000000` is the NV2A aperture base
+the same library uses for the PFB kick bit — the aperture path works; this
+channel copy simply sits outside the aperture.
+
+**Root cause**: the game's channel lives at guest VA `0x00800000` (PUT at
++0x40, GET at +0x44) and the kick is a write to the doorbell at VA
+`0x80000000`. The runtime's NV2A ack thread models exactly this handshake —
+PUT → GET at 0xFD800040/44 — for the aperture's USER window, but nothing
+acknowledges the game's own channel object. GET stays 0, the wait spins.
+
+**Fix** (`engine_pfifo_ack_thread`, started in step 5c): a 1 ms poll that,
+whenever the channel shows the library waiting (PUT ahead of GET), reports
+the submitted commands consumed (`GET = PUT`). Same modelling and same
+honesty argument as the runtime's own ack thread: the push buffer is not
+executed here (the toolkit's D3D11 layer draws), so "all consumed" is the
+truthful answer. Field offsets are documented in `src/main.c` next to the
+constants; all were cross-checked against this disassembly.
+
+**Also confirmed on the way**:
+- `sub_000EDAF6` (the small-submission path) sets `dev->[0x23BC] =
+  0xF9B38` and `chan->[0x44] = chan->[0x40]` itself — the game knows how to
+  ack its own channel when its `dev+8` bit 0x20 is set; here that bit is
+  clear, so the main path (0x000EDA94) runs instead, whose GET-advance call
+  `sub_000E7B90` is gated on `MEM32(0xF9B84)` — a global no instruction in the
+  entire XBE ever writes (it is BSS, zero in the file), so on hardware it is
+  presumably initialised by the GPU driver/ISR. The engine-level ack covers
+  that gap without faking the global.
+- The NV2A register model (previous commit) does answer the aperture reads:
+  the library's PFB flush spin at 0x000EDAB4 now clears (the runtime ack
+  thread's 0x100410 handling) and the boot proceeds to the pushbuffer wait.
+- The tail-jump frame is *not* corrupted: `[esp]` in `sub_000EE943` is the
+  device object exactly as the original expects (`dev+0x2C28 = 0x80001020`
+  proves the prologue's `mov eax,[esp]` chain reads the saved slot), because
+  the recomp restores esp to the frame level around ICALLs.
+
+**Next iterations to expect** (each: engine tweak → CI ~19 min → run →
+classify): the asset-loading path (Media/, .pkx/.xpr/.sgd), the vblank/PCRTC
+interrupt the title may wait on before the first Present, and the audio init
+(DSOUND section). The loop is unchanged: crash → `tools.seed_from_log` or
+engine fix → rebuild.
