@@ -4043,5 +4043,15 @@
   "start": "0x000F4D74",
   "observed": true,
   "note": "runtime ICALL failure: asset-loading path, coverage gap in the D3D section"
+ },
+ {
+  "start": "0x000E8120",
+  "observed": true,
+  "note": "runtime ICALL failure: D3D pointer-table entry in a coverage gap (asset-loading path)"
+ },
+ {
+  "start": "0x000E8960",
+  "observed": true,
+  "note": "runtime ICALL failure: D3D pointer-table entry in a coverage gap (asset-loading path)"
  }
 ]
