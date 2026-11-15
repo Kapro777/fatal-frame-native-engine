@@ -45,6 +45,93 @@
 /* xboxrecomp runtime headers */
 #include <xbox/xboxrecomp.h>
 
+/* ── NV2A register model ────────────────────────────────────
+ *
+ * The XDK D3D8 library is linked into this XBE (section "D3D"), so the
+ * game's device creation runs as recompiled code that talks to the NV2A
+ * GPU through its register aperture at 0xFD000000. The runtime maps that
+ * aperture as plain zeroed RAM ("no register semantics"), which is enough
+ * for titles that only write push buffers -- but Fatal Frame's D3D8 lib
+ * *reads* the register file during device bring-up (263 reads of
+ * NV_PMC_BOOT_0 alone, plus PFB/PRAMDAC/PFIFO status) and never writes it.
+ * Every read answers 0, the library's GPU-identity check fails, and its
+ * DMA channel is never initialised: dev->[0x44] (the consumed position)
+ * stays 0 while dev->[0] (the ring write pointer) is 0x80002000, so the
+ * game spins forever in the pushbuffer wait at 0x000EECD6.
+ *
+ * The toolkit ships the register model (src/nv2a, extracted from xemu:
+ * NV_PMC_BOOT_0 -> 0x02A000A3, PFIFO/PFB/PGRAPH/PRAMDAC handlers). It is
+ * not installed by default -- the game project installs it. Route the
+ * aperture's accesses into the model by trapping the pages and decoding
+ * the faulting instruction, exactly as the toolkit's MMIO hook documents.
+ */
+#include "nv2a/nv2a_state.h"
+#include "nv2a/nv2a_mmio_hook.h"
+
+/* Aperture geometry, mirroring the runtime's own constants (it keeps them
+ * private in xbox_memory_layout.c). */
+#define ENGINE_NV2A_BASE  0xFD000000u
+#define ENGINE_NV2A_SIZE  (16u * 1024u * 1024u)
+
+/* Route an NV2A access into the register model. Returns TRUE when the
+ * instruction was decoded and emulated (RIP advanced past it). */
+static LONG CALLBACK engine_nv2a_veh(PEXCEPTION_POINTERS ep)
+{
+    uintptr_t fault_addr;
+    uintptr_t base;
+
+    if (ep->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION)
+        return EXCEPTION_CONTINUE_SEARCH;
+
+    fault_addr = (uintptr_t)ep->ExceptionRecord->ExceptionInformation[1];
+    base = (uintptr_t)ENGINE_NV2A_BASE + (uintptr_t)g_xbox_mem_offset;
+    if (fault_addr < base || fault_addr >= base + ENGINE_NV2A_SIZE)
+        return EXCEPTION_CONTINUE_SEARCH;
+
+    {
+        int is_write = ep->ExceptionRecord->ExceptionInformation[0] != 0;
+        uint32_t fault_va = (uint32_t)(fault_addr - (uintptr_t)g_xbox_mem_offset);
+        if (nv2a_hook_handle_mmio(ep->ContextRecord, fault_addr,
+                                  fault_va, is_write))
+            return EXCEPTION_CONTINUE_EXECUTION;
+    }
+    return EXCEPTION_CONTINUE_SEARCH;
+}
+
+/* Install the model over the whole register aperture. Called once the
+ * Xbox memory is mapped and the kernel bridge is up, before the game's
+ * entry point runs. */
+static void engine_nv2a_install(void)
+{
+    uintptr_t base = (uintptr_t)ENGINE_NV2A_BASE + (uintptr_t)g_xbox_mem_offset;
+    DWORD old_protect;
+    size_t off;
+
+    /* The model itself: VRAM, RAMIN and the register handlers. The hook's
+     * own init also traps the PVIDEO page for the overlay scan-out. */
+    nv2a_hook_init(g_xbox_mem_offset);
+
+    for (off = 0; off < ENGINE_NV2A_SIZE; off += 0x1000u) {
+        if (!VirtualProtect((LPVOID)(base + off), 0x1000u, PAGE_NOACCESS,
+                            &old_protect)) {
+            fprintf(stderr, "[NV2A] page 0x%08X not trapped (error %lu); "
+                            "register reads will keep returning 0\n",
+                    ENGINE_NV2A_BASE + (uint32_t)off, GetLastError());
+            return;
+        }
+    }
+
+    if (!AddVectoredExceptionHandler(1, engine_nv2a_veh)) {
+        fprintf(stderr, "[NV2A] VEH not installed; register reads will "
+                        "keep returning 0\n");
+        return;
+    }
+
+    fprintf(stderr, "[NV2A] register model installed over the %u MB aperture "
+                    "(reads now answer hardware values)\n",
+            ENGINE_NV2A_SIZE / (1024u * 1024u));
+}
+
 /*
  * If xboxrecomp.h is not an umbrella header in your setup, include
  * the individual headers directly:
@@ -366,6 +453,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     /* Step 5: Initialize kernel bridge (thunk table in Xbox memory) */
     printf("Initializing kernel bridge...\n");
     xbox_kernel_bridge_init();
+
+    /* Step 5b: NV2A register model, so the game's D3D8 library reads real
+     * hardware values from the GPU aperture instead of zeros (without it
+     * the device bring-up never finishes its DMA handshake). */
+    printf("Installing NV2A register model...\n");
+    engine_nv2a_install();
 
     /* Step 6: Initialize stack */
     g_esp = XBOX_STACK_TOP;

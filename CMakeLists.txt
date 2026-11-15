@@ -71,11 +71,13 @@ add_executable(${PROJECT_NAME} WIN32
 # Link against the xboxrecomp umbrella target (all 6 runtime libraries)
 target_link_libraries(${PROJECT_NAME} PRIVATE xboxrecomp)
 
-# Include paths for generated recomp headers
+# Include paths for generated recomp headers and the toolkit's internal
+# headers (nv2a/nv2a_state.h and nv2a/nv2a_mmio_hook.h live under src/)
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/recomp
     ${XBOXRECOMP_DIR}/include
+    ${XBOXRECOMP_DIR}/src
 )
 
 # Windows SDK libraries needed at link time
