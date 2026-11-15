@@ -20,9 +20,9 @@
  *   - Add any CRT global pre-initialization your game needs
  *   - Customize the VEH handler for game-specific crash diagnosis
  *
- * XBE Details (from tools.xbe_parser, Fatal Frame Xbox retail build):
- *   Title:       Fatal Frame (Xbox, 2002)
- *   Debug path:  C:\ffx\ffx\Release\ffx.exe
+ * XBE Details (from tools.xbe_parser, Lethal Shot Xbox retail build):
+ *   Title:       Lethal Shot (Xbox, 2002)
+ *   Debug path:  C:\<title>\Release\<title>.exe
  *   Title ID:    0x54430004
  *   Base addr:   0x00010000
  *   Entry point: 0x000DAB5D
@@ -51,7 +51,7 @@
  * game's device creation runs as recompiled code that talks to the NV2A
  * GPU through its register aperture at 0xFD000000. The runtime maps that
  * aperture as plain zeroed RAM ("no register semantics"), which is enough
- * for titles that only write push buffers -- but Fatal Frame's D3D8 lib
+ * for titles that only write push buffers -- but Lethal Shot's D3D8 lib
  * *reads* the register file during device bring-up (263 reads of
  * NV_PMC_BOOT_0 alone, plus PFB/PRAMDAC/PFIFO status) and never writes it.
  * Every read answers 0, the library's GPU-identity check fails, and its
@@ -480,7 +480,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     setvbuf(stdout, NULL, _IONBF, 0);
     setvbuf(stderr, NULL, _IONBF, 0);
 
-    printf("=== Fatal Frame (Xbox) - Static Recompilation ===\n");
+    printf("=== Lethal Shot - Static Recompilation ===\n");
     printf("Loading XBE...\n");
 
     /* Install VEH handler (first handler in chain) */

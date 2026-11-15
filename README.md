@@ -1,6 +1,6 @@
-# Fatal Frame Native Engine
+# Lethal Shot Native Engine
 
-Static recompilation of **Fatal Frame (Xbox, 2002, Tecmo)** into a native
+Static recompilation of **Lethal Shot (Xbox, 2002, Tecmo)** into a native
 Windows executable, built on the
 [sp00nznet/xboxrecomp](https://github.com/sp00nznet/xboxrecomp) toolkit.
 
@@ -21,13 +21,13 @@ Full plan: [`docs/targets.md`](docs/targets.md).
 
 * **This repository contains no game code, no game assets, and no copyrighted
   material of any kind.** It is pure host-side engine code plus a build system.
-* You must **own a legitimate copy of Fatal Frame for the original Xbox** to
+* You must **own a legitimate copy of Lethal Shot for the original Xbox** to
   use this project. The toolkit contract and Xbox static recompilation in
   general require a legally acquired disc image.
-* Nothing here grants you a license to distribute Fatal Frame, its code, its
+* Nothing here grants you a license to distribute Lethal Shot, its code, its
   assets, or any executable derived from them. Built `.exe` files contain the
   game's code and are for personal use on the machine that built them.
-* Fatal Frame is a trademark of its respective owners. This project is an
+* Lethal Shot is a trademark of its respective owners. This project is an
   independent, non-commercial preservation effort, **not affiliated with or
   endorsed by Tecmo, Microsoft, or any other rights holder**.
 * By using this project you agree to comply with all applicable laws in your
@@ -48,12 +48,12 @@ default.xbe ──parse──▶ disasm ──func_id──▶ abi_analysis ─�
                                           this repo (engine + runtime) ◀┘
                                                    cmake + MSVC
                                                          │
-                                                    fatalframe_native.exe
+                                                    lethalshot_native.exe
 ```
 
 The heavy steps (pipeline + compilation) run in GitHub Actions in the
 companion repository
-[Kapro777/fatal-frame-xbox-recomp](https://github.com/Kapro777/fatal-frame-xbox-recomp),
+[Kapro777/lethal-shot-build-farm](https://github.com/Kapro777/lethal-shot-build-farm),
 not on your machine. See `docs/` there for the pipeline notes.
 
 ## Layout
@@ -76,27 +76,27 @@ You need three things: this repo, the toolkit clone, and your own XBE.
 
 ```bash
 git clone https://github.com/sp00nznet/xboxrecomp.git      # toolkit
-git clone https://github.com/Kapro777/fatal-frame-native-engine.git
-cd fatal-frame-native-engine
+git clone https://github.com/Kapro777/lethal-shot-engine.git
+cd lethal-shot-engine
 
 # 1. Extract default.xbe from your disc image into game/
 mkdir game
-#    (extract-xiso -x "Fatal Frame.iso" -d game/ , or xdvdfs, or the toolkit's
-#     own extractor: py -3 -m tools.xiso unpack "Fatal Frame.iso" -o game/)
+#    (extract-xiso -x "Lethal Shot.iso" -d game/ , or xdvdfs, or the toolkit's
+#     own extractor: py -3 -m tools.xiso unpack "Lethal Shot.iso" -o game/)
 #    Also copy the full Media/ tree there: the game reads its assets at runtime.
 
 # 2. Generate the C code from XBE (run inside the toolkit clone)
-py -3 -m tools.xbe_parser    game/default.xbe --json game/fatalframe_analysis.json
+py -3 -m tools.xbe_parser    game/default.xbe --json game/title_analysis.json
 py -3 -m tools.disasm        game/default.xbe --text-only -v
 py -3 -m tools.func_id       game/default.xbe -v
 py -3 -m tools.abi_analysis  game/default.xbe -v
 py -3 -m tools.recomp        game/default.xbe --all --split 250 \
-        --game-name "Fatal Frame" --gen-dir ../fatal-frame-native-engine/src/recomp/gen
+        --game-name "Lethal Shot" --gen-dir ../lethal-shot-engine/src/recomp/gen
 
 # 3. Build the native executable (needs CMake 3.20+ and MSVC / VS 2022)
 cmake -S . -B build -DXBOXRECOMP_DIR=../xboxrecomp -A x64
 cmake --build build --config Release
-build\Release\fatalframe_native.exe
+build\Release\lethalshot_native.exe
 ```
 
 Requirements: Python 3.10+ with `capstone`, CMake 3.20+, MSVC (Visual Studio

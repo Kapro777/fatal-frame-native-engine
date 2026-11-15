@@ -1,4 +1,4 @@
-# Fatal Frame (Xbox) — per-title profile
+# Lethal Shot (Xbox) — per-title profile
 
 Everything below is **metadata about the XBE format** (headers, section layout,
 import list). No game code or assets is included. Values are from
@@ -8,8 +8,8 @@ import list). No game code or assets is included. Values are from
 
 | Field | Value |
 |---|---|
-| Title | Fatal Frame (Xbox, original, 2002) |
-| Debug path | `C:\ffx\ffx\Release\ffx.exe` |
+| Title | Lethal Shot (Xbox, original, 2002) |
+| Debug path | `C:\<title>\Release\<title>.exe` |
 | Title ID | `0x54430004` |
 | Region | North America, Japan, Rest of World |
 | Build | 2002-10-31, version 30724 |

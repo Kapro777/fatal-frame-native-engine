@@ -1,6 +1,6 @@
 # Bring-up log
 
-Running record of the Fatal Frame (Xbox) static recompilation bring-up.
+Running record of the Lethal Shot (Xbox) static recompilation bring-up.
 Newest entries at the bottom.
 
 ## 2026-11-15 — D3D device create fixed (seeds + entry-stubs); next blocker: NV2A channel
@@ -55,7 +55,8 @@ esp=0x00F7FD94, edx=0x80002000).
   inconsistent downstream by construction — see the POKE comment in the
   toolkit.
 
-**Options for the next engineer** (in order of preference):
+**Options at the time** (all since resolved — see the evening entry below;
+the register model (option 2) is what was actually installed):
 1. **Bridge the D3D8 entry points** (documented model): override the game's
    D3D entry (`sub_000EBFE0` from `sub_00011DD0`, then the device-create path)
    via `--manual-functions` + `recomp_lookup_manual` to return the toolkit's
@@ -66,13 +67,11 @@ esp=0x00F7FD94, edx=0x80002000).
    from the engine's `main.c` + protect the register aperture so the D3D8
    lib's reads get modelled values (boot id, PFIFO status, channel USER).
    Today `nv2a_hook_init` only protects the PVIDEO page and is not installed.
-3. **xemu comparison as ground truth** (xemu downloaded at
-   `C:\Users\USER\fatal\xemu\`) to confirm the boot chain on real hardware.
 
 **Loop assets built**:
 * `bringup-iterate.ps1` — local seed convergence (disasm + func_id + abi +
   recomp + unresolved-diff), ~4 min/round, no CI.
-* `fatal-frame-xbox-recomp/docs/HANDOFF.md` + `docs/PROMPT.md` — full handoff.
+* `lethal-shot-build-farm/docs/HANDOFF.md` + `docs/PROMPT.md` — full handoff.
 
 ## 2026-11-14 — Project scaffolded, first cloud build green
 
@@ -80,11 +79,11 @@ esp=0x00F7FD94, edx=0x80002000).
 - Confirmed disc: Xbox XDVDFS, `default.xbe` 1,773,568 bytes, title
   `0x54430004`, English retail build (no Shift-JIS menu strings in the XBE).
 - Three repositories created on the owner's account:
-  - `fatal-frame-native-engine` (public) — engine + runtime + docs, ships no
+  - `lethal-shot-engine` (public) — engine + runtime + docs, ships no
     game code
-  - `fatal-frame-xbox-recomp` (public) — CI build farm, no game code
-  - `fatal-frame-xbe` (private) — the owner's `default.xbe`, input only
-  - `fatal-frame-builds` (private) — derived `.exe` outputs, output only
+  - `lethal-shot-build-farm` (public) — CI build farm, no game code
+  - `lethal-shot-input` (private) — the owner's `default.xbe`, input only
+  - `lethal-shot-builds` (private) — derived `.exe` outputs, output only
 - Engine project cloned from `templates/new-game/`, entry point
   `0x000DAB5D`, game dir `game/`.
 
@@ -103,7 +102,7 @@ esp=0x00F7FD94, edx=0x80002000).
 source (a `-S .` + relative-path parsing quirk under pwsh), so only the
 toolkit's libraries and test executables built and no game `.exe` appeared.
 Fixed in the workflow with absolute `github.workspace` paths, an explicit
-`--target fatalframe_native`, and a `CMAKE_HOME_DIRECTORY` assertion. The
+`--target lethalshot_native`, and a `CMAKE_HOME_DIRECTORY` assertion. The
 second run confirmed the correct project is configured
 (`CMAKE_HOME_DIRECTORY=.../engine`, `XBOXRECOMP_DIR=.../xboxrecomp`); a
 PowerShell read-only `$home` variable broke the assertion script and was
