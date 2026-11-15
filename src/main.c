@@ -209,6 +209,19 @@ static void engine_nv2a_install(void)
     DWORD old_protect;
     size_t off;
 
+    /* The handler FIRST, then the traps. The runtime's own NV2A ack thread
+     * ticks the register file from the moment the layout is up, and the
+     * hook's init traps the PVIDEO page before this function returns: an
+     * access to a trapped page before the handler exists is an unguarded
+     * fault that takes the process down silently (observed on a fast
+     * runner, never on the slow notebook -- it is a timing race, so it is
+     * fixed by ordering, not by luck). */
+    if (!AddVectoredExceptionHandler(1, engine_nv2a_veh)) {
+        fprintf(stderr, "[NV2A] VEH not installed; register reads will "
+                        "keep returning 0\n");
+        return;
+    }
+
     /* The model itself: VRAM, RAMIN and the register handlers. The hook's
      * own init also traps the PVIDEO page for the overlay scan-out. */
     nv2a_hook_init(g_xbox_mem_offset);
@@ -221,12 +234,6 @@ static void engine_nv2a_install(void)
                     ENGINE_NV2A_BASE + (uint32_t)off, GetLastError());
             return;
         }
-    }
-
-    if (!AddVectoredExceptionHandler(1, engine_nv2a_veh)) {
-        fprintf(stderr, "[NV2A] VEH not installed; register reads will "
-                        "keep returning 0\n");
-        return;
     }
 
     fprintf(stderr, "[NV2A] register model installed over the %u MB aperture "

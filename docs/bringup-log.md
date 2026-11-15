@@ -201,3 +201,41 @@ classify): the asset-loading path (Media/, .pkx/.xpr/.sgd), the vblank/PCRTC
 interrupt the title may wait on before the first Present, and the audio init
 (DSOUND section). The loop is unchanged: crash → `tools.seed_from_log` or
 engine fix → rebuild.
+
+## 2026-11-15 (late) — VRAM window fix: the boot reaches asset loading
+
+**Fix**: `engine_nv2a_veh` now also routes faults in `0xF0000000`–`0xFCFFFFFF`
+to the toolkit's `nv2a_hook_handle_vram` (it allocates zeroed pages on
+demand — exactly what a hardware read gives a title before the first frame;
+the real VRAM backing is future work).
+
+**Result** (build `run-43765103996`, run on the owner's notebook with the
+full disc): the pushbuffer wait at `0x000EECD6` no longer even runs, and the
+boot reaches **file I/O**: 327 kernel calls, then a repeating cycle
+
+```
+RtlInitAnsiString (ord 289) -> NtCreateFile (190) -> NtReadFile (219) -> NtClose (187)
+```
+
+19 complete cycles, all from return addresses inside one function
+(`0x000D84xx`–`0x000D8Axx`), then a crash reading guest VA `0xCA5DFE19`
+with `esi = 0xCA5DFE19`, `eax = 0xFFFDA6EA`, `ecx = 0xADADADAD` — a pointer
+chase through an uninitialised structure, i.e. the title is loading assets
+from the disc and one of the reads produced (or exposed) a bad pointer.
+Next step: identify the file the cycle was on when it crashed — the kernel
+log names the path of every `NtCreateFile`, and the disc extraction in the
+run directory is complete — then compare the read result against the file.
+
+**Also fixed (CI-only, seen by the new smoke run)**: the NV2A install
+trapped the aperture *before* installing the vectored handler, and the
+runtime's ack thread ticks the register file continuously, so a fast
+runner can take an unguarded fault in that window and die silently right
+after the MMIO hook's init line (0 kernel calls). The handler is now
+installed first, then the traps — ordering, not luck.
+
+**Feedback channel for GitHub-only iteration**: `build.yml` now runs the
+built exe on the runner for a bounded time (watchdog 25 s) and publishes
+the log as the `smoke-run-<run-id>` artifact with a `SMOKE_SUMMARY` line
+in the job log. Note the runner has only the XBE, not the disc, so a
+smoke run reproduces the boot but not the file stage — for that, the
+owner runs `tools/bringup/safe-run.ps1` locally and pastes the log.
