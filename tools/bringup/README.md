@@ -7,7 +7,7 @@ on the generated C, which the build pipeline publishes privately.
 
 | File | What it does | Needs |
 |---|---|---|
-| `xbe_tools.py` | Section table, on-disk dword peek, entry point, 32-bit disassembly of any VA range | Python 3 + capstone; the XBE (private input repo) |
+the title executable (an owner-held copy; CI can extract it from the input store)
 | `analyze_gen.py` | Dump a function from the generated C, find every access to a field offset, list callees, locate the function owning a VA | Python 3; the generated C (CI artifact `generated-c-*`) |
 | `safe-run.ps1` | Run a built exe constrained (idle priority, one core, bounded by the runtime watchdog, hard kill, game-dir write snapshot) | Windows; the built exe + the game directory next to it |
 

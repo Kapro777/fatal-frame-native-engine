@@ -82,8 +82,8 @@ the register model (option 2) is what was actually installed):
   - `lethal-shot-engine` (public) — engine + runtime + docs, ships no
     game code
   - `lethal-shot-build-farm` (public) — CI build farm, no game code
-  - `lethal-shot-input` (private) — the owner's `default.xbe`, input only
-  - `lethal-shot-builds` (private) — derived `.exe` outputs, output only
+  - a private input store (the title executable) — never named in public docs
+  - a private artifact store (built binaries) — scaffolding, deleted when the port ships
 - Engine project cloned from `templates/new-game/`, entry point
   `0x000DAB5D`, game dir `game/`.
 
