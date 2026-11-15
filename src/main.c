@@ -73,6 +73,10 @@
 #define ENGINE_NV2A_BASE  0xFD000000u
 #define ENGINE_NV2A_SIZE  (16u * 1024u * 1024u)
 
+/* Native-to-Xbox VA offset, defined by the runtime's memory layout module
+ * (the master header documents it but declares no prototype for it). */
+extern ptrdiff_t g_xbox_mem_offset;
+
 /* Route an NV2A access into the register model. Returns TRUE when the
  * instruction was decoded and emulated (RIP advanced past it). */
 static LONG CALLBACK engine_nv2a_veh(PEXCEPTION_POINTERS ep)
