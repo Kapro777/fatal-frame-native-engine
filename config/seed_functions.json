@@ -2,31 +2,1411 @@
  {
   "start": "0x000DAAEE",
   "observed": true,
-  "note": "PsCreateSystemThreadEx StartContext1 observed at runtime; decodes as a function body."
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E6C54",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E6C64",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E6CC8",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E6DF5",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E6EA3",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E7008",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E701B",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E7021",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E708E",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E70D8",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E7267",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E7279",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E7296",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E74B4",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E74E4",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E74EA",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E7987",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E7B20",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E7B2A",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E7C44",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E7C8A",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E7CF7",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E7E14",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
  },
  {
   "start": "0x000E8040",
   "observed": true,
-  "note": "Indirect-call target observed at runtime; decodes as a function body."
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E8103",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E816C",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E81A9",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E8553",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E8654",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E8A28",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E8A35",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E8A42",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E8A47",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E8BE7",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E9098",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E909E",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E91B9",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E958C",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E958E",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E9659",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E965B",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000E9A30",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EA1F5",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EA211",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EA213",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EA475",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EA4AB",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EA4B2",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EA5D9",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EA654",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EA795",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EABBD",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EABD0",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EAD14",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EAD27",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EAE40",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EAE5D",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EAF50",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EAF55",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EB06D",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EB779",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EB8A4",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EB944",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EB9AA",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EBA20",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EBAFE",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EBD78",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EBD8F",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EBE3F",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EBE79",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EBE85",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EC107",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EC158",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EC230",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EC678",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EC67C",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EC681",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EC6BA",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EC6C2",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EC6CA",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EC77F",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EC7C1",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EC800",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EC8D2",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EC961",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EC9F7",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000ECA64",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000ECB5F",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000ECB6A",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000ECC53",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000ECC64",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000ED567",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000ED900",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000ED998",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000ED9C5",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EDA27",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EDA29",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EDA83",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EDA85",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EDD21",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EDD89",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EDF84",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EDF86",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EDFB5",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EDFE7",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EDFF3",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EE943",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EF4E2",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EF4ED",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EF70A",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EF71D",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EF728",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EF750",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EF828",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EF8C2",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EF9B1",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EFEA0",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EFF32",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EFF93",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000EFFAD",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F052B",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F055C",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F0C57",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F0F9C",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F0F9F",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F1223",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F1479",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F150C",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F1592",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F15E9",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F1604",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F17A3",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F17B2",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F17D6",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F188B",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F193C",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F19AC",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F1A43",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F1B2A",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F1E09",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F1E2D",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F226F",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F2274",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F269C",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F277B",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F2928",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F2998",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F2999",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F2A7B",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F2A9B",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F2AAC",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F2AE9",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F47E6",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F4888",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F4CD0",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000F5148",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FA5C8",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FA5CA",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FAE38",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FAE74",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FAF6A",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FAFAB",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FB027",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FB035",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FB08D",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FB4E2",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FB52E",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FB638",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FB698",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FE036",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FE03E",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FE7F0",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FE82F",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FEE8E",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FEEAB",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FEECC",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FEECE",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FEF55",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FF014",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FF292",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FF47B",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FF4AF",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FF865",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FF88A",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FF8B6",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FF8D9",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FF905",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FF92A",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FF959",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FF9AE",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FF9DB",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FFA00",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FFCA3",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FFD1F",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FFD55",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FFDAA",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FFDCC",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FFDF8",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FFE1A",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FFE46",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FFE68",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FFE94",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FFEB6",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FFEBA",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FFF0C",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FFF5E",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x000FFFB0",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x001001BC",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x001001BE",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x0010025B",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x001002A5",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x001002D9",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x0010033F",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100695",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x001006BF",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x001006EB",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100715",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100741",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100767",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100796",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x001007CD",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x001007FD",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100834",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100861",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x0010088B",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x001008B7",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x001008E5",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100911",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x0010093F",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x0010096E",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x001009A9",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x001009D6",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100A04",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100D0D",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100D43",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100D72",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100DD4",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100E04",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100E4C",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100E7C",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100EC2",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100EF4",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00100FBC",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00101187",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x001011E8",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00101438",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x0010149A",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00101677",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x001016E4",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00101847",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00101894",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00101A91",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00101A93",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00101A97",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
  },
  {
   "start": "0x00102792",
   "observed": true,
-  "note": "Indirect-call target observed at runtime; decodes as a function body."
+  "note": "unresolved call target found in generated C (or runtime-observed)"
  },
  {
   "start": "0x0010279D",
   "observed": true,
-  "note": "Indirect-call target observed at runtime; decodes as a function body."
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00103D4B",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00107BF3",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00107BF7",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00107C07",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
  },
  {
   "start": "0x00107E41",
   "observed": true,
-  "note": "Indirect-call target observed at runtime; decodes as a function body."
+  "note": "unresolved call target found in generated C (or runtime-observed)"
  },
  {
   "start": "0x00107E4C",
   "observed": true,
-  "note": "Indirect-call target observed at runtime; decodes as a function body."
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x0011E468",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x0011E46A",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x0015037C",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00150F20",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00150F6E",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00150F92",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00150FC5",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x0015102A",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00151191",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00151198",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x001511D4",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00151212",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x0015123B",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00151254",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x001512B5",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x0015158A",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x001515D4",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00151AC1",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
+ },
+ {
+  "start": "0x00151AC7",
+  "observed": true,
+  "note": "unresolved call target found in generated C (or runtime-observed)"
  }
 ]
