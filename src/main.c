@@ -77,6 +77,88 @@
  * (the master header documents it but declares no prototype for it). */
 extern ptrdiff_t g_xbox_mem_offset;
 
+/* One guest dword, from host code (the runtime exposes no generic guest
+ * read helper for game projects, and the recomp MEM32 macros live in the
+ * generated code's translation unit). */
+static uint32_t engine_mem32(uint32_t va)
+{
+    return *(volatile uint32_t *)((uintptr_t)va + (uintptr_t)g_xbox_mem_offset);
+}
+
+static void engine_mem32_write(uint32_t va, uint32_t v)
+{
+    *(volatile uint32_t *)((uintptr_t)va + (uintptr_t)g_xbox_mem_offset) = v;
+}
+
+/* ── PFIFO user-DMA channel acknowledgement ─────────────────
+ *
+ * The XDK D3D8 in this title keeps its NV2A FIFO user-DMA channel at
+ * guest VA 0x00800000 (outside the register aperture): the submitted
+ * write position (PUT) at +0x40, the consumed position (GET) at +0x44.
+ * Submission writes the same position to the doorbell at VA 0x80000000
+ * and the library then spins until GET advances to PUT -- the wait at
+ * 0x000EECD6, `test (GET ^ PUT), 0x0FFFFFFF / jne`.
+ *
+ * Nothing here runs a GPU pusher, so GET would stay at 0 forever:
+ * on hardware the GPU consumes the ring asynchronously, which is a
+ * handshake, not a computation to reproduce.
+ *
+ * This is the same acknowledgement the runtime's own NV2A ack thread
+ * models for the aperture's USER window (PUT -> GET at 0xFD800040 /
+ * 0xFD800044, xbox_memory_layout.c) -- the commands are not executed
+ * from the push buffer here (the D3D11 layer draws), so reporting them
+ * consumed is the truthful answer, in the runtime's own words. The
+ * title just keeps its channel copy outside the aperture, so
+ * acknowledge that path here rather than in the aperture thread.
+ *
+ * Field offsets, recovered from the boot trace and cross-checked
+ * against the on-disk XBE disassembly (0x000EEC78..0x000EECD6):
+ *   dev  = MEM32(0xF9B80)     the D3D device object (0x000F6F40 here)
+ *   chan = MEM32(dev + 0x23BC) the channel object (0x00800000 here)
+ * A zero or wild pointer means the channel is not established yet, so
+ * the polls are silent until device creation finishes storing it.
+ */
+#define ENGINE_PFIFO_DEV_GLOBAL   0xF9B80u
+#define ENGINE_PFIFO_DEV_CHAN_OFF 0x23BCu
+#define ENGINE_PFIFO_CHAN_PUT_OFF 0x40u
+#define ENGINE_PFIFO_CHAN_GET_OFF 0x44u
+#define ENGINE_PFIFO_RAM_HI       0x04000000u  /* 64 MB guest window */
+
+static DWORD WINAPI engine_pfifo_ack_thread(LPVOID unused)
+{
+    (void)unused;
+    for (;;) {
+        uint32_t dev, chan, put;
+
+        Sleep(1);
+        dev = engine_mem32(ENGINE_PFIFO_DEV_GLOBAL);
+        if (!dev || dev >= ENGINE_PFIFO_RAM_HI)
+            continue;
+        chan = engine_mem32(dev + ENGINE_PFIFO_DEV_CHAN_OFF);
+        if (chan < 0x10000u || chan >= ENGINE_PFIFO_RAM_HI)
+            continue;                       /* channel not established yet */
+        put = engine_mem32(chan + ENGINE_PFIFO_CHAN_PUT_OFF);
+        if (!put)
+            continue;
+        if (engine_mem32(chan + ENGINE_PFIFO_CHAN_GET_OFF) != put)
+            engine_mem32_write(chan + ENGINE_PFIFO_CHAN_GET_OFF, put);
+    }
+    return 0;
+}
+
+static void engine_pfifo_ack_install(void)
+{
+    HANDLE t = CreateThread(NULL, 0, engine_pfifo_ack_thread, NULL, 0, NULL);
+    if (!t) {
+        fprintf(stderr, "[PFIFO] channel ack thread not started (error %lu); "
+                        "the push-buffer wait will hang\n", GetLastError());
+        return;
+    }
+    CloseHandle(t);
+    fprintf(stderr, "[PFIFO] channel ack armed (GET follows PUT on the "
+                    "0x00800000 user-DMA channel)\n");
+}
+
 /* Route an NV2A access into the register model. Returns TRUE when the
  * instruction was decoded and emulated (RIP advanced past it). */
 static LONG CALLBACK engine_nv2a_veh(PEXCEPTION_POINTERS ep)
@@ -463,6 +545,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
      * the device bring-up never finishes its DMA handshake). */
     printf("Installing NV2A register model...\n");
     engine_nv2a_install();
+
+    /* Step 5c: acknowledge the PFIFO user-DMA channel: the game's D3D8
+     * library spins waiting for the GPU to consume its submitted push
+     * buffer, and there is no GPU pusher here. Without this the wait at
+     * 0x000EECD6 never ends and device creation hangs. */
+    printf("Installing PFIFO channel ack...\n");
+    engine_pfifo_ack_install();
 
     /* Step 6: Initialize stack */
     g_esp = XBOX_STACK_TOP;
