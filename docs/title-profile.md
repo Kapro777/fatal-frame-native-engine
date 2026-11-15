@@ -81,6 +81,6 @@ opens into the `game/` directory.
 ## Notes
 
 * Single-threaded candidate: 103 kernel imports, no network dependency.
-* Old XDK (4721): simpler kernel patterns, closer to the emulator reference
+* Old XDK (4721): simpler kernel patterns, closer to the public reference
   implementations, than the 5849 titles.
 * Region is NA/JP/ROW but the build is the English retail one.

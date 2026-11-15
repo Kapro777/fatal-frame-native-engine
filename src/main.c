@@ -59,8 +59,8 @@
  * stays 0 while dev->[0] (the ring write pointer) is 0x80002000, so the
  * game spins forever in the pushbuffer wait at 0x000EECD6.
  *
- * The toolkit ships the register model (src/nv2a, extracted from xemu:
- * NV_PMC_BOOT_0 -> 0x02A000A3, PFIFO/PFB/PGRAPH/PRAMDAC handlers). It is
+ * The toolkit ships the register model (src/nv2a, with hardware-
+ * NV_PMC_BOOT_0 -> 0x02A000A3, PFIFO/PFB/PGRAPH/PRAMDAC). It is
  * not installed by default -- the game project installs it. Route the
  * aperture's accesses into the model by trapping the pages and decoding
  * the faulting instruction, exactly as the toolkit's MMIO hook documents.
@@ -161,7 +161,7 @@ static void engine_pfifo_ack_install(void)
 }
 
 /* Route an NV2A access into the register model. Returns TRUE when the
- * instruction was decoded and emulated (RIP advanced past it). */
+ * instruction was decoded and executed (RIP advanced past it). */
 static LONG CALLBACK engine_nv2a_veh(PEXCEPTION_POINTERS ep)
 {
     uintptr_t fault_addr;
@@ -396,7 +396,7 @@ static void print_guest_context(void *rip)
     }
 }
 
-/* The emulated APU.
+/* The APU host layer.
  *
  * Two entry points that had no callers anywhere in the tree. apu_mmio_hook.c
  * documents apu_hook_handle_mmio as "called from VEH in main.c" and no main.c
@@ -529,7 +529,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     g_xbox_mem_offset = xbox_GetMemoryOffset();
     printf("Xbox memory mapped. Offset: 0x%llX\n", (unsigned long long)g_xbox_mem_offset);
 
-    /* Bring up the emulated APU.
+    /* Bring up the APU host layer.
      *
      * Gated on the same variable that unmaps its registers, because the two
      * halves are useless apart: a trap with no model declines every access,
@@ -538,7 +538,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
      * base. */
     if (getenv("RECOMP_AC97_READY")) {
         g_apu_state = mcpx_apu_init_standalone((uint8_t *)xbox_GetMemoryBase());
-        fprintf(stderr, "[BOOT] emulated APU %s\n",
+        fprintf(stderr, "[BOOT] APU host layer %s\n",
                 g_apu_state ? "up" : "FAILED to initialise");
     }
 

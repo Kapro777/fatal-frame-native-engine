@@ -41,8 +41,8 @@ L: call 0xED750                  ; 400-iteration busy delay
 XDK D3D8 lib's NV2A channel/PFIFO initialization reads/writes hardware
 registers through the NV2A aperture — which the runtime backs as plain zeroed
 RAM with "no register semantics" (see `xbox_memory_layout.c`, the NV2A
-aperture comment: *"the fix is to bridge the D3D8 entry point that owns the
-loop, not to start emulating NV2A"*). The garbage pointer makes the GET read
+aperture comment: the stance at the time was to bridge the D3D8 entry
+point that owns the loop, not to model the GPU register file*). The garbage pointer makes the GET read
 return 0 forever → the wait never completes → the watchdog fires (guest
 esp=0x00F7FD94, edx=0x80002000).
 
@@ -62,7 +62,7 @@ the register model (option 2) is what was actually installed):
    via `--manual-functions` + `recomp_lookup_manual` to return the toolkit's
    `xbox_Direct3DCreate8` / `IDirect3D8` vtable, so the game's D3D calls go
    through the toolkit's D3D11 layer and never touch NV2A MMIO. See
-   `docs/technical/d3d-translation.md` in the toolkit (COM vtable emulation).
+   `docs/technical/d3d-translation.md` in the toolkit (COM vtable hosting).
 2. **Install the NV2A register model**: `nv2a_hook_init(g_xbox_mem_offset)`
    from the engine's `main.c` + protect the register aperture so the D3D8
    lib's reads get modelled values (boot id, PFIFO status, channel USER).

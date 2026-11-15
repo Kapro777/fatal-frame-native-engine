@@ -1,6 +1,6 @@
 # Lethal Shot Native Engine
 
-Static recompilation of **Lethal Shot (Xbox, 2002, Tecmo)** into a native
+Static recompilation of the owner's own game disc into a native
 Windows executable, built on the
 [sp00nznet/xboxrecomp](https://github.com/sp00nznet/xboxrecomp) toolkit.
 
@@ -27,9 +27,9 @@ Full plan: [`docs/targets.md`](docs/targets.md).
 * Nothing here grants you a license to distribute Lethal Shot, its code, its
   assets, or any executable derived from them. Built `.exe` files contain the
   game's code and are for personal use on the machine that built them.
-* Lethal Shot is a trademark of its respective owners. This project is an
+* The original title belongs to its respective owners. This project is an
   independent, non-commercial preservation effort, **not affiliated with or
-  endorsed by Tecmo, Microsoft, or any other rights holder**.
+  endorsed by any rights holder**.
 * By using this project you agree to comply with all applicable laws in your
   jurisdiction regarding reverse engineering and interoperability.
 
@@ -38,7 +38,7 @@ Full plan: [`docs/targets.md`](docs/targets.md).
 The original Xbox is an x86 machine. The game executable (`default.xbe`) is
 x86 machine code. This project disassembles that binary, translates **every
 function** into equivalent C source code, and compiles that C with MSVC into a
-regular x86-64 Windows `.exe`. There is no emulator and no interpreter: the
+regular x86-64 Windows `.exe`. No interpreter, no dynamic re-translation: the
 game's own logic executes directly on your CPU, against the runtime layer in
 this repository.
 
