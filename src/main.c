@@ -72,6 +72,7 @@
  * private in xbox_memory_layout.c). */
 #define ENGINE_NV2A_BASE  0xFD000000u
 #define ENGINE_NV2A_SIZE  (16u * 1024u * 1024u)
+#define ENGINE_VRAM_BASE  0xF0000000u
 
 /* Native-to-Xbox VA offset, defined by the runtime's memory layout module
  * (the master header documents it but declares no prototype for it). */
@@ -171,8 +172,23 @@ static LONG CALLBACK engine_nv2a_veh(PEXCEPTION_POINTERS ep)
 
     fault_addr = (uintptr_t)ep->ExceptionRecord->ExceptionInformation[1];
     base = (uintptr_t)ENGINE_NV2A_BASE + (uintptr_t)g_xbox_mem_offset;
-    if (fault_addr < base || fault_addr >= base + ENGINE_NV2A_SIZE)
+    if (fault_addr < base || fault_addr >= base + ENGINE_NV2A_SIZE) {
+        /* The VRAM window above the runtime's tiled RAM alias: the alias
+         * (0xF0000000, physical RAM a second time) is mapped, but the
+         * framebuffer space above it is not -- the title reads and writes
+         * its surfaces there. The hook's placeholder allocates zeroed
+         * pages on demand, which is what a hardware read would give a
+         * title before the first frame anyway. */
+        uintptr_t vram = (uintptr_t)ENGINE_VRAM_BASE +
+                         (uintptr_t)g_xbox_mem_offset;
+        if (fault_addr >= vram && fault_addr < base) {
+            uint32_t vram_va = (uint32_t)(fault_addr -
+                                          (uintptr_t)g_xbox_mem_offset);
+            if (nv2a_hook_handle_vram(fault_addr, vram_va))
+                return EXCEPTION_CONTINUE_EXECUTION;
+        }
         return EXCEPTION_CONTINUE_SEARCH;
+    }
 
     {
         int is_write = ep->ExceptionRecord->ExceptionInformation[0] != 0;
