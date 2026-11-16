@@ -22,8 +22,16 @@
 #include <stdint.h>
 #include <stddef.h>   /* ptrdiff_t */
 
-/* The generated vocabulary (MEM16/PUSH32/esp as g_esp, RECOMP_ICALL_SAFE_AT).
- * The recompiler emits src/recomp/gen/recomp_types.h ahead of the build. */
+/* The generated vocabulary (MEM16/PUSH32, and the RECOMP_ICALL_SAFE_AT
+ * macro, which itself writes the bare register names). The recompiler emits
+ * src/recomp/gen/recomp_types.h ahead of the build.
+ *
+ * RECOMP_GENERATED_CODE activates the register aliases (eax -> g_eax, ...),
+ * which the header otherwise keeps out of hand-written code. A manual
+ * override that calls RECOMP_ICALL_SAFE_AT needs them -- the macro sets
+ * `eax = 0` on a failed call -- so they are on for this translation unit
+ * only, and this file sticks to the g_ names outside the macro. */
+#define RECOMP_GENERATED_CODE
 #include "gen/recomp_types.h"
 
 /* ── ICALL trace ring buffer ───────────────────────────────── */
