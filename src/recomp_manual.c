@@ -52,6 +52,9 @@ typedef void (*recomp_func_t)(void);
 
 extern uint32_t g_eax;
 extern ptrdiff_t g_xbox_mem_offset;
+/* NOTE: g_esp/g_ecx/g_edx come from recomp_types.h (included above), which
+ * also marks the register set RECOMP_TLS -- redeclaring g_eax here next to
+ * that header's own declaration is tolerated by MSVC but redundant. */
 
 /* ── Manual function overrides ─────────────────────────────── */
 
@@ -111,15 +114,15 @@ extern ptrdiff_t g_xbox_mem_offset;
 static void sub_00150E9C(void)
 {
     MEM16(0x39777A) = 0;
-    PUSH32(esp, 0);
-    PUSH32(esp, 0x397730);
+    PUSH32(g_esp, 0);
+    PUSH32(g_esp, 0x397730);
     MEM16(0x397778) = 6;
     {
-        uint32_t _icall_esp = esp;
+        uint32_t _icall_esp = g_esp;
         uint32_t _icall_target = MEM32(0x15608C);
         RECOMP_ICALL_SAFE_AT(_icall_target, _icall_esp, 0x00150EB4u);
     }
-    esp += 4; return; /* ret 4 */
+    g_esp += 4; return; /* ret 4 */
 }
 
 recomp_func_t recomp_lookup_manual(uint32_t xbox_va)
