@@ -4063,5 +4063,280 @@
   "start": "0x000E88F0",
   "observed": true,
   "note": "D3D render-state setter, coverage gap 0xE8869..0xE89B0 (submits NV2A method 0x8038C)"
+ },
+ {
+  "start": "0x000EF2FF",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000EF319",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000EF2F2",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000EF30C",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000EF2FF",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000EF319",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000EF2F2",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000EF30C",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4BE3",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4BD9",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4B9D",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4BB7",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4BBE",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4BD2",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4CDE",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4D28",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4D2F",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4D69",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4D44",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4DA1",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4D99",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4D8E",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4DBC",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4DD7",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4E03",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4E03",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4E03",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4E03",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4E34",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4E59",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4E95",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4EC1",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4EC8",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4EF4",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4F4D",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4F92",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4FBB",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4F32",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000F4F32",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000E8590",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000E8760",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000E87E0",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000E98E0",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000E9960",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000E9860",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000E98A0",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000E8670",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000E99B0",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000E86E0",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000E96F0",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000E9720",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000E9790",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000E9800",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000E9820",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x000E9840",
+  "observed": true,
+  "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
  }
 ]
