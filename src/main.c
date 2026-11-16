@@ -124,12 +124,14 @@ static void engine_mem32_write(uint32_t va, uint32_t v)
 #define ENGINE_PFIFO_CHAN_PUT_OFF 0x40u
 #define ENGINE_PFIFO_CHAN_GET_OFF 0x44u
 #define ENGINE_PFIFO_RAM_HI       0x04000000u  /* 64 MB guest window */
+#define ENGINE_PFIFO_RING_LO      0x00100000u  /* ring physical window: */
+#define ENGINE_PFIFO_RING_HI      0x01000000u  /* 0x80001000..0x80FFFFFF */
 
 static DWORD WINAPI engine_pfifo_ack_thread(LPVOID unused)
 {
     (void)unused;
     for (;;) {
-        uint32_t dev, chan, put;
+        uint32_t dev, chan, cursor;
 
         Sleep(1);
         dev = engine_mem32(ENGINE_PFIFO_DEV_GLOBAL);
@@ -138,11 +140,27 @@ static DWORD WINAPI engine_pfifo_ack_thread(LPVOID unused)
         chan = engine_mem32(dev + ENGINE_PFIFO_DEV_CHAN_OFF);
         if (chan < 0x10000u || chan >= ENGINE_PFIFO_RAM_HI)
             continue;                       /* channel not established yet */
-        put = engine_mem32(chan + ENGINE_PFIFO_CHAN_PUT_OFF);
-        if (!put)
-            continue;
-        if (engine_mem32(chan + ENGINE_PFIFO_CHAN_GET_OFF) != put)
-            engine_mem32_write(chan + ENGINE_PFIFO_CHAN_GET_OFF, put);
+        /* (a) the channel's own PUT -- the library's flush updates this
+         * pair itself (dev->[0] & 0xFFFFFFF in both slots), so mirroring
+         * one to the other keeps GET == PUT between flushes. */
+        {
+            uint32_t cput = engine_mem32(chan + ENGINE_PFIFO_CHAN_PUT_OFF);
+            if (cput && engine_mem32(chan + ENGINE_PFIFO_CHAN_GET_OFF) != cput)
+                engine_mem32_write(chan + ENGINE_PFIFO_CHAN_GET_OFF, cput);
+        }
+        /* (b) the live ring write cursor in the device object. The title
+         * submits method words straight into the ring (advancing dev->[0])
+         * and only folds that position into the channel pair when it
+         * flushes -- but the ring-space waiter reads the channel GET on
+         * every method, so without this a title that submits faster than
+         * it flushes fills the ring and spins in the space wait forever.
+         * Reporting the live cursor as consumed is the same honesty as
+         * (a): the commands are not executed here, the D3D11 layer
+         * draws. A wild cursor (mid-init, or after reset) is skipped. */
+        cursor = engine_mem32(dev) & 0x0FFFFFFFu;
+        if (cursor >= ENGINE_PFIFO_RING_LO && cursor < ENGINE_PFIFO_RING_HI
+            && engine_mem32(chan + ENGINE_PFIFO_CHAN_GET_OFF) < cursor)
+            engine_mem32_write(chan + ENGINE_PFIFO_CHAN_GET_OFF, cursor);
     }
     return 0;
 }
