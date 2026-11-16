@@ -22,6 +22,10 @@
 #include <stdint.h>
 #include <stddef.h>   /* ptrdiff_t */
 
+/* The generated vocabulary (MEM16/PUSH32/esp as g_esp, RECOMP_ICALL_SAFE_AT).
+ * The recompiler emits src/recomp/gen/recomp_types.h ahead of the build. */
+#include "gen/recomp_types.h"
+
 /* ── ICALL trace ring buffer ───────────────────────────────── */
 
 /*
@@ -85,9 +89,48 @@ extern ptrdiff_t g_xbox_mem_offset;
  *       g_eax = result;
  *   }
  */
+/* ── XPP input-init stub at 0x00150E9C (hand-written) ─────────────────
+ *
+ * The XPP (input) library's device table calls this entry, but the
+ * disassembler cannot express it: the sweep's phase through this region
+ * makes 0x150E9C look mid-instruction, the seed then leaves a dispatch
+ * hole, and the call fails with eax=0 — which the title later reads as a
+ * null handler. Verified against the on-disk XBE (0x150E9C is a clean
+ * instruction boundary; the body is 33 bytes, 0x150E9C..0x150EBD):
+ *
+ *   0x00150E9C: and word [0x39777A], 0
+ *   0x00150EA4: push 0                  ; arg2
+ *   0x00150EA6: push 0x397730           ; arg1
+ *   0x00150EAB: mov word [0x397778], 6
+ *   0x00150EB4: call dword [0x15608C]   ; kernel import, thunk slot 59
+ *   0x00150EBA: ret 4
+ *
+ * stdcall throughout: the import pops the two pushed arguments, the ret
+ * pops the caller's one. The return value is the import's eax.
+ */
+static void sub_00150E9C(void)
+{
+    MEM16(0x39777A) = 0;
+    PUSH32(esp, 0);
+    PUSH32(esp, 0x397730);
+    MEM16(0x397778) = 6;
+    {
+        uint32_t _icall_esp = esp;
+        uint32_t _icall_target = MEM32(0x15608C);
+        RECOMP_ICALL_SAFE_AT(_icall_target, _icall_esp, 0x00150EB4u);
+    }
+    esp += 4; return; /* ret 4 */
+}
+
 recomp_func_t recomp_lookup_manual(uint32_t xbox_va)
 {
     (void)xbox_va;
+    switch (xbox_va) {
+    case 0x00150E9Cu:
+        return (recomp_func_t)sub_00150E9C;
+    default:
+        break;
+    }
     return (recomp_func_t)0;
 }
 
