@@ -4338,5 +4338,80 @@
   "start": "0x000E9840",
   "observed": true,
   "note": "D3D pointer-table entry (render-state setter family); table recovered from the XBE data section, closes the coverage gap in one pass"
+ },
+ {
+  "start": "0x0015024C",
+  "observed": true,
+  "note": "XPP pointer-table entry (input/pad library); runtime ICALL named 0x00150E9C / 0x00150483"
+ },
+ {
+  "start": "0x0015026C",
+  "observed": true,
+  "note": "XPP pointer-table entry (input/pad library); runtime ICALL named 0x00150E9C / 0x00150483"
+ },
+ {
+  "start": "0x00150278",
+  "observed": true,
+  "note": "XPP pointer-table entry (input/pad library); runtime ICALL named 0x00150E9C / 0x00150483"
+ },
+ {
+  "start": "0x00150280",
+  "observed": true,
+  "note": "XPP pointer-table entry (input/pad library); runtime ICALL named 0x00150E9C / 0x00150483"
+ },
+ {
+  "start": "0x00151725",
+  "observed": true,
+  "note": "XPP pointer-table entry (input/pad library); runtime ICALL named 0x00150E9C / 0x00150483"
+ },
+ {
+  "start": "0x001502A0",
+  "observed": true,
+  "note": "XPP pointer-table entry (input/pad library); runtime ICALL named 0x00150E9C / 0x00150483"
+ },
+ {
+  "start": "0x001502B4",
+  "observed": true,
+  "note": "XPP pointer-table entry (input/pad library); runtime ICALL named 0x00150E9C / 0x00150483"
+ },
+ {
+  "start": "0x001502BC",
+  "observed": true,
+  "note": "XPP pointer-table entry (input/pad library); runtime ICALL named 0x00150E9C / 0x00150483"
+ },
+ {
+  "start": "0x001502C4",
+  "observed": true,
+  "note": "XPP pointer-table entry (input/pad library); runtime ICALL named 0x00150E9C / 0x00150483"
+ },
+ {
+  "start": "0x0015179B",
+  "observed": true,
+  "note": "XPP pointer-table entry (input/pad library); runtime ICALL named 0x00150E9C / 0x00150483"
+ },
+ {
+  "start": "0x00150483",
+  "observed": true,
+  "note": "XPP section coverage gap (input/pad library); entry verified as a function prologue"
+ },
+ {
+  "start": "0x00150834",
+  "observed": true,
+  "note": "XPP section coverage gap (input/pad library); entry verified as a function prologue"
+ },
+ {
+  "start": "0x001514AE",
+  "observed": true,
+  "note": "XPP section coverage gap (input/pad library); entry verified as a function prologue"
+ },
+ {
+  "start": "0x001539EC",
+  "observed": true,
+  "note": "XPP section coverage gap (input/pad library); entry verified as a function prologue"
+ },
+ {
+  "start": "0x0015533C",
+  "observed": true,
+  "note": "XPP section coverage gap (input/pad library); entry verified as a function prologue"
  }
 ]
