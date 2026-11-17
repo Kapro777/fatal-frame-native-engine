@@ -124,8 +124,8 @@ static void engine_mem32_write(uint32_t va, uint32_t v)
 #define ENGINE_PFIFO_CHAN_PUT_OFF 0x40u
 #define ENGINE_PFIFO_CHAN_GET_OFF 0x44u
 #define ENGINE_PFIFO_RAM_HI       0x04000000u  /* 64 MB guest window */
-#define ENGINE_PFIFO_RING_LO      0x00100000u  /* ring physical window: */
-#define ENGINE_PFIFO_RING_HI      0x01000000u  /* 0x80001000..0x80FFFFFF */
+#define ENGINE_PFIFO_RING_HEADROOM 0x00004000u /* the 16 KB the FIFO waiter */
+                                                /* demands before a method  */
 
 static DWORD WINAPI engine_pfifo_ack_thread(LPVOID unused)
 {
@@ -148,26 +148,45 @@ static DWORD WINAPI engine_pfifo_ack_thread(LPVOID unused)
             if (cput && engine_mem32(chan + ENGINE_PFIFO_CHAN_GET_OFF) != cput)
                 engine_mem32_write(chan + ENGINE_PFIFO_CHAN_GET_OFF, cput);
         }
-        /* (b) the live ring write cursor in the device object. The title
-         * submits method words straight into the ring (advancing dev->[0])
-         * and only folds that position into the channel pair when it
-         * flushes -- but the ring-space waiter reads the channel GET on
-         * every method, so without this a title that submits faster than
-         * it flushes fills the ring and spins in the space wait forever.
-         * Reporting the live cursor as consumed is the same honesty as
-         * (a): the commands are not executed here, the D3D11 layer
-         * draws. Bounds are the ring's own, from the device object:
-         * dev->[0x24] is the ring base and dev->[0x28] its end (both VAs
-         * of the contiguous window), so a mid-init or wild cursor is
-         * skipped without hardcoding any geometry. */
+        /* (b) the ring-space model. The title submits method words straight into
+         * its ring (advancing dev->[0] as a guest VA; the ring runs from
+         * dev->[0x24] to dev->[4], inside the contiguous window that
+         * dev->[0x28] bounds) and the ring-space waiter
+         * (sub_000EDD50, the software-FIFO path) computes the free space
+         * from the channel's consumed position, MEM32(chan+0x44). The
+         * title only folds its live cursor into that slot when it
+         * flushes, and this title never reaches its own flush -- so on
+         * hardware the GPU's DMA engine is what advances it.
+         *
+         * The waiter's space is (GET - PUT) mod ring_size, and it demands
+         * a 16 KB (0x4000) headroom before it will place a method, so a
+         * GET equal to the cursor (2 dwords of room, measured) still
+         * starves it. The model that answers both: the GPU lags the
+         * writer by one whole ring minus that headroom -- everything
+         * submitted is consumed (the D3D11 layer draws, exactly as the
+         * runtime's own ack thread argues) and there is always room for
+         * the headroom. The geometry is the device's own, so nothing is
+         * hardcoded and a mid-init or wild cursor is skipped. */
         {
             uint32_t base = engine_mem32(dev + 0x24) & 0x0FFFFFFFu;
-            uint32_t end  = engine_mem32(dev + 0x28) & 0x0FFFFFFFu;
-            if (base && end > base) {
-                cursor = engine_mem32(dev) & 0x0FFFFFFFu;
-                if (cursor >= base && cursor <= end)
-                    engine_mem32_write(chan + ENGINE_PFIFO_CHAN_GET_OFF,
-                                      cursor);
+            uint32_t end  = engine_mem32(dev + 4)    & 0x0FFFFFFFu;
+            if (base && end > base + 0x8000u) {     /* a real ring, not noise */
+                uint32_t size = end - base;
+                uint32_t want = base + ENGINE_PFIFO_RING_HEADROOM;
+                if (want < end) {
+                    cursor = engine_mem32(dev) & 0x0FFFFFFFu;
+                    if (cursor >= base && cursor <= end) {
+                        /* keep GET an entire ring behind the writer, so
+                         * (GET - PUT) mod size == size - headroom */
+                        uint32_t get = cursor + size - ENGINE_PFIFO_RING_HEADROOM;
+                        if (get > end)
+                            get -= size;
+                        if (get < base)
+                            get = base;
+                        engine_mem32_write(chan + ENGINE_PFIFO_CHAN_GET_OFF,
+                                          get);
+                    }
+                }
             }
         }
     }
