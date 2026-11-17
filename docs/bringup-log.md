@@ -239,3 +239,63 @@ the log as the `smoke-run-<run-id>` artifact with a `SMOKE_SUMMARY` line
 in the job log. Note the runner has only the XBE, not the disc, so a
 smoke run reproduces the boot but not the file stage — for that, the
 owner runs `tools/bringup/safe-run.ps1` locally and pastes the log.
+
+## 2026-11-17 — the boot reaches the graphics path (software FIFO ring)
+
+**State**: the port now runs the title's real code end to end: 330 kernel
+calls, the whole D3D device create, the input (XPP) init, the disc file
+loop that loads `Media/tim/*.xp2` textures (the "now loading" screen),
+and the sprite/quad submission that draws them.
+
+**The current blocker** — a deadlock in the title's software FIFO:
+
+* The submitter (`sub_000F1823`, entered from the sprite path
+  `sub_000BFA40 → sub_000B53B0 → sub_000B5260 → … → sub_000EAB40`) writes
+  NV2A method words (0x417FC, 0x40001818, 0x40328, 0x8038C …) into a ring
+  in guest RAM, advancing `dev->[0]`; when the cursor reaches the ring
+  end (`dev->[4]`) it calls `sub_000EDED0 → sub_000EDD50`, the ring-space
+  waiter.
+* The waiter computes the free space from the channel's consumed
+  position: `eax = MEM32(MEM32(dev+0x23BC) + 0x44)` (the channel GET),
+  with a fallback to the aperture's own PFIFO GET at
+  `[dev+0x4FC] + 0x324C`.
+* Nothing advances that GET: the title only folds its live cursor into
+  the channel pair inside its own flush (`sub_000EDAF6`), and that path
+  is only taken when the flag bit `dev+8 & 0x20` is set — it is clear
+  here. On hardware the GPU's DMA engine consumes the ring and the GET
+  advances asynchronously.
+* Result: each waiter call reports exactly 2 dwords of space, forever.
+  Observed over 1,471 consecutive calls: `eax=2`, `ecx=0x8000A794`
+  constant, and the guest `esp` drifting down ~5 bytes per iteration (a
+  small stack leak in the same path — a second symptom, not the cause).
+  The game spins in the wait; the watchdog never fires because the guest
+  keeps making progress (one method per iteration).
+
+**What was tried** (each verified against the run's log):
+1. `engine_pfifo_ack_thread` mirroring the channel's own PUT→GET (the
+   flush's semantics) — insufficient: the channel PUT is only updated by
+   the flush that never runs.
+2. Also mirroring the live ring cursor `dev->[0]` (bounds taken from the
+   ring itself, `dev->[0x24]`/`dev->[0x28]`) — the wait rate improves
+   ~2x but the space still never grows: the waiter needs the GET past the
+   ring base, not merely equal to the cursor.
+3. `RECOMP_PB_EXEC=1` (the toolkit's pushbuffer executor) — it executes
+   the submissions but drives the *aperture's* USER window
+   (0xFD800040/44), which this title never writes, so it does not consume
+   this ring.
+4. `RECOMP_POKE=0xF9B84:1` (the flush-path gate, a global no instruction
+   in the XBE ever writes) — no change.
+
+**Next step (the graphics phase)**: make the ring's consumption modelled.
+Two candidate shapes, both engine-level in `src/main.c`:
+* (a) route the title's FIFO doorbell — the write to guest VA
+  `0x80000000` the device-create kick performs — into the register model
+  (the aperture's USER DMA PUT at 0xFD800040), so the existing ack/executor
+  machinery sees the submissions, and mirror the resulting consumption
+  back to the channel GET the waiter reads; or
+* (b) teach the ack thread to advance the channel GET ahead of the cursor
+  (the GPU-ran-ahead model), which unblocks the space wait directly.
+
+Material for that work: `tools/bringup/xbe_tools.py disasm` over
+`0x000EDD50` (the waiter), `0x000F1823` (the submitter), `0x000EDC10`
+(the FIFO method writer), and `sub_000EAB40` (the texture-method entry).
