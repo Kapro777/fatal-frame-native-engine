@@ -156,11 +156,20 @@ static DWORD WINAPI engine_pfifo_ack_thread(LPVOID unused)
          * it flushes fills the ring and spins in the space wait forever.
          * Reporting the live cursor as consumed is the same honesty as
          * (a): the commands are not executed here, the D3D11 layer
-         * draws. A wild cursor (mid-init, or after reset) is skipped. */
-        cursor = engine_mem32(dev) & 0x0FFFFFFFu;
-        if (cursor >= ENGINE_PFIFO_RING_LO && cursor < ENGINE_PFIFO_RING_HI
-            && engine_mem32(chan + ENGINE_PFIFO_CHAN_GET_OFF) < cursor)
-            engine_mem32_write(chan + ENGINE_PFIFO_CHAN_GET_OFF, cursor);
+         * draws. Bounds are the ring's own, from the device object:
+         * dev->[0x24] is the ring base and dev->[0x28] its end (both VAs
+         * of the contiguous window), so a mid-init or wild cursor is
+         * skipped without hardcoding any geometry. */
+        {
+            uint32_t base = engine_mem32(dev + 0x24) & 0x0FFFFFFFu;
+            uint32_t end  = engine_mem32(dev + 0x28) & 0x0FFFFFFFu;
+            if (base && end > base) {
+                cursor = engine_mem32(dev) & 0x0FFFFFFFu;
+                if (cursor >= base && cursor <= end)
+                    engine_mem32_write(chan + ENGINE_PFIFO_CHAN_GET_OFF,
+                                      cursor);
+            }
+        }
     }
     return 0;
 }
