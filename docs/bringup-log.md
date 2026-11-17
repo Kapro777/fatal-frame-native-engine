@@ -299,3 +299,48 @@ Two candidate shapes, both engine-level in `src/main.c`:
 Material for that work: `tools/bringup/xbe_tools.py disasm` over
 `0x000EDD50` (the waiter), `0x000F1823` (the submitter), `0x000EDC10`
 (the FIFO method writer), and `sub_000EAB40` (the texture-method entry).
+
+### 2026-11-17 (later) — the flush dispatcher and the ring struct
+
+Additional facts recovered while trying to unblock the wait (all verified
+from the run's log or the XBE):
+
+* The submit path is the **render-state flush**: `sub_000F2790` reads the
+  dirty-word at guest `0xF9B8C` and calls one submitter per dirty bit
+  (`0xF13F0`, `0xF1560`, `0xF4C30`, `0xF16E0`, `0xF18D0`, `0xF1AB0`,
+  `0xF2250`, `0xF2590` — a `state bit -> method batch` table), then clears
+  the flags (`& 0xC0000070`). Each submitter submits its methods through
+  `sub_000F1823` (one method per call) and waits for ring room via
+  `sub_000EDED0 -> sub_000EDD50` when its pointer pair says "full".
+* The ring itself: `sub_000ED80B` (the tail of `sub_000ED7E0`, after the
+  512 KB `MmAllocateContiguousMemoryEx(0x404, ...)` allocation) sets
+  `dev->[0]` = the ring base and `dev->[4]` = the ring end
+  (`base + (MEM32(0xFA320) >> 2) * 4 - 0x204`; the two D3D globals default
+  to `0x80000` total and `0x8000` per chunk, set by `sub_000E8070`).
+  `dev->[4]` drifts during use (the space waiter rewrites it as a
+  sliding end, observed `0x8000A794` against a base of `0x80002000`).
+* The struct the submitter checks against is the 96-byte device context
+  at `dev->[0x34]` (guest `0x80001000`, the `EE900` allocation): its
+  `[0]` is a small reservation counter (set to 3 by `sub_000ED80B`) and
+  `[4]` — which the submitter compares it against — is **0 and is never
+  written anywhere in the XBE**, so the "is there room" compare
+  (`reserved < capacity`) can never pass. On hardware the GPU driver/ISR
+  presumably maintains this pair the same way it maintains the channel
+  GET.
+* Probes taken at the stall with `RECOMP_PEEK` (fires with the periodic
+  report: `RECOMP_PB_EXEC=1 RECOMP_PB_REPORT_MS=2000`):
+  `context[0]=3 context[4]=0 dev[0]=0x80002998 dev[4]=0x8000A794
+  chanPUT=0x2000 chanGET=0x712C` — the channel GET mirror is working;
+  the wait is not reading it on this path.
+* Tried and did not unblock it (each verified): `RECOMP_POKE=0xF9B84:1`
+  (the flush-path gate), `RECOMP_POKE=0x80001004:0x20000` (the capacity
+  slot), and the ring-space lag model in `engine_pfifo_ack_thread`
+  (kept; it is the honest "submitted = consumed" statement and harmless).
+
+**Conclusion**: the wait has several independent gates (the channel GET,
+the context reservation pair, possibly an aperture fallback), and this
+title's software FIFO expects the GPU-side maintenance of all of them.
+Unblocking it means modelling that maintenance — the pushbuffer/FIFO
+consumption work of the graphics phase, not a one-line fix. The engine is
+left in its last green state; the trail above is what the next engineer
+(or agent) should start from.
