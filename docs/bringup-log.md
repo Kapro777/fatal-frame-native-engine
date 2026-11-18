@@ -420,3 +420,42 @@ what starved the wait.
 **Conclusion**: the wait has one gate, not several: the channel GET
 versus `cursor + chunk`. The context pair and the 0xF9B84 gate were
 red herrings for this deadlock.
+
+### 2026-11-18 (later) — the doorbell wait, and the dead zone (fixed)
+
+The first fix attempt built from the analysis above (consumed position
+`chunk` bytes behind the writer) **regressed the boot to 201 kernel
+calls**: it starved an earlier handshake on the very same slot. That
+handshake is the submission kick, disassembled at 0x000EEC78..0x000EED00:
+
+* the kick writes the doorbell at guest VA 0x80000000 with
+  `(dev->[0x24] & 0xFFFFFFF) + 1`, `wbinvd`, then calls `sub_000EDA70`;
+* it then spins at 0x000EECD6 (`call 0xed750`, `jne` back) while
+  `(dev->[0] ^ MEM32(chan + 0x44)) & 0x0FFFFFFF != 0` — i.e. it wants
+  the consumed position **equal to the write cursor**, byte for byte.
+
+So the two handshakes on `chan->[0x44]` are:
+
+| phase | wait | what it wants |
+|---|---|---|
+| the submission kick | `0x000EECD6` | `consumed == cursor` |
+| the ring-space gate  | `0x000EDE19` | `cursor >= consumed` **or** `consumed > cursor + chunk` |
+
+`consumed == cursor` satisfies both — the gate's first clause is a `jae`,
+not a `ja`. Everything else fails somewhere: consumed *ahead* of the
+cursor breaks the doorbell equality; consumed derived from `dev->[4]`
+(which the waiter itself rewrites as a sliding end, `cursor + chunk -
+0x204`) lands in the dead zone *between* the two clauses and starves
+whichever handshake is running; and the earlier attempt to mirror the
+cursor used a hardcoded window (`0x10000..0x1000000`) that the real
+cursor — a raw offset into the contiguous allocation, `0x2998` — never
+entered, so it never fired at all (measured: the wait rate improved ~2x
+from the PUT mirror alone, but the GET stayed ahead in the dead zone).
+
+**The model now in the engine** (`engine_pfifo_ack_thread`): when the
+ring is live — `dev->[0x24]`/`dev->[0x28]` sane and the cursor inside
+them — report the consumed position equal to the cursor; until then,
+mirror the channel PUT into the GET (the doorbell phase, where the
+library keeps the pair equal itself). Both phases verified by
+disassembly; the run that prompted this note is the one that fell back
+to 201 kernel calls with the chunk-lag model.
