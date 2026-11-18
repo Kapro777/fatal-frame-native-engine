@@ -119,25 +119,24 @@ static void engine_mem32_write(uint32_t va, uint32_t v)
  * A zero or wild pointer means the channel is not established yet, so
  * the polls are silent until device creation finishes storing it.
  *
- * There is a second, stricter handshake on the same object: the title's
- * software FIFO submits one NV2A method per call through sub_000F1823
- * and, when its write cursor (dev->[0], a VA inside the 512 KB
- * contiguous window) reaches the sliding end (dev->[4]), it asks for
- * room via sub_000EDED0 -> sub_000EDD50 -> sub_000EDD89. The gate
- * there, from the XBE at 0x000EDE19..0x000EDE21, is
+ * There is a second handshake on the same object: the title's software
+ * FIFO submits one NV2A method per call through sub_000F1823 and, when
+ * its write cursor (dev->[0], a VA inside the 512 KB contiguous window)
+ * reaches the sliding end (dev->[4]), it asks for room via
+ * sub_000EDED0 -> sub_000EDD50 -> sub_000EDD89. The gate there, from the
+ * XBE at 0x000EDE19..0x000EDE21, is
  *
- *     room  <=>  consumed >= cursor  ||  consumed > cursor + chunk
+ *     room  <=>  cursor >= consumed  ||  consumed > cursor + chunk
  *     consumed = MEM32(chan + 0x44) | 0x80000000   (the channel GET,
  *                bounds-checked against dev->[0x24]..dev->[0x28], else
  *                the aperture GET at [dev->[0x4FC] + 0x324C])
  *     chunk    = MEM32(0xFA320)       (the title's own ring chunk size)
+ *     cursor   = dev->[0]
  *
- * so the GPU-side maintenance this thread models is not "GET == PUT"
- * (that reads as zero room and starves the waiter -- measured at
- * exactly 2 dwords of space, forever) but "the consumer lags the
- * writer by one chunk", which is the same handshake expressed the way
- * the waiter measures it. All of the geometry is read from the device
- * object at run time, so nothing about this title is baked in.
+ * Both that gate and the doorbell wait are answered by reporting the
+ * consumed position equal to the write cursor (see the model's comment
+ * in the thread body), so the geometry the model needs is the ring's:
+ * dev->[0x24] (base) and dev->[0x28] (end).
  */
 #define ENGINE_PFIFO_DEV_GLOBAL   0xF9B80u
 #define ENGINE_PFIFO_DEV_CHAN_OFF 0x23BCu
@@ -146,7 +145,6 @@ static void engine_mem32_write(uint32_t va, uint32_t v)
 #define ENGINE_PFIFO_RAM_HI       0x04000000u  /* 64 MB guest window */
 #define ENGINE_PFIFO_RING_BASE_OFF 0x24u       /* ring base VA (dev->[0x24]) */
 #define ENGINE_PFIFO_RING_END_OFF  0x28u       /* ring end VA  (dev->[0x28]) */
-#define ENGINE_PFIFO_CHUNK_GLOBAL  0xFA320u    /* ring chunk size (bytes) */
 
 static DWORD WINAPI engine_pfifo_ack_thread(LPVOID unused)
 {
@@ -161,43 +159,51 @@ static DWORD WINAPI engine_pfifo_ack_thread(LPVOID unused)
         chan = engine_mem32(dev + ENGINE_PFIFO_DEV_CHAN_OFF);
         if (chan < 0x10000u || chan >= ENGINE_PFIFO_RAM_HI)
             continue;                       /* channel not established yet */
-        /* The ring-space model. The title writes method words into its ring,
-         * advancing dev->[0] as a guest VA, and only folds that cursor into
-         * the channel pair when it flushes -- which it never reaches while
-         * the waiter starves. On hardware the GPU's DMA engine advances the
-         * consumed position (chan->[0x44]) as it reads the ring, and the
-         * waiter measures room as "consumed is a chunk ahead of the cursor"
-         * (see the gate quoted in the comment above).
+        /* The consumed position, modelled the way both of the title's
+         * handshakes on this slot measure it (both gates disassembled from
+         * the XBE and quoted in the comment above):
          *
-         * The model: keep the consumer exactly one chunk behind the writer,
-         * so the room the waiter measures is (ring size - chunk) -- always
-         * more than the chunk it demands. Everything submitted is treated as
-         * consumed (the D3D11 layer draws, the same argument the runtime's
-         * own aperture ack thread makes for the USER window). Geometry and
-         * lag come from the device object and the title's own chunk global,
-         * so a mid-init or wild cursor is skipped rather than guessed at.
+         *  - the doorbell wait (0x000EECD6) spins while
+         *    (dev->[0] ^ chan->[0x44]) & 0x0FFFFFFF != 0, i.e. it wants the
+         *    consumed position to equal the write cursor;
+         *  - the ring-space gate (0x000EDE19) grants room when
+         *    cursor >= consumed || consumed > cursor + chunk, and equality
+         *    satisfies its first clause (it is a jae, not a ja).
          *
-         * The channel's PUT is deliberately left alone: mirroring PUT into
-         * GET (the library's own flush semantics) reads as zero room and is
-         * what starved this wait in the first place. */
+         * So "everything submitted is consumed" -- the consumed position
+         * equal to the write cursor -- answers both, in every region of the
+         * ring: right after the kick (the doorbell equality) and while the
+         * writer advances through the ring (cursor ahead of consumed, the
+         * gate's first clause). The D3D11 layer draws, which is the same
+         * argument the runtime's own NV2A ack thread makes for the
+         * aperture's USER window.
+         *
+         * The geometry is the device's own, so a mid-init or wild cursor is
+         * skipped rather than guessed at; until it is established the only
+         * handshake running is the doorbell's, and the library keeps the
+         * channel pair equal itself (dev->[0] & 0xFFFFFFF in both slots),
+         * so the PUT is mirrored into the GET there.
+         *
+         * What does NOT work, each measured: the consumed position ahead of
+         * the cursor (a "GPU ran ahead" model) breaks the doorbell equality;
+         * the consumed position derived from dev->[4] -- which the waiter
+         * itself rewrites as a sliding end -- lands in the dead zone between
+         * the gate's two clauses and starves it; and a fixed window around
+         * the ring never fires at all, because the cursor is a raw offset
+         * into the contiguous allocation, not a VA in that window. */
         {
             uint32_t base  = engine_mem32(dev + ENGINE_PFIFO_RING_BASE_OFF)
                              & 0x0FFFFFFFu;
             uint32_t upper = engine_mem32(dev + ENGINE_PFIFO_RING_END_OFF)
                              & 0x0FFFFFFFu;
-            if (base && upper > base + 0x8000u) {   /* a real ring, not noise */
-                uint32_t size = upper - base;
-                uint32_t lag  = engine_mem32(ENGINE_PFIFO_CHUNK_GLOBAL);
-                if (lag == 0u || lag >= size / 2u)  /* a sane backlog */
-                    lag = size / 4u;
-                cursor = engine_mem32(dev) & 0x0FFFFFFFu;
-                if (cursor >= base && cursor < upper) {
-                    uint32_t get = base +
-                        ((cursor - base + size - lag) % size);
-                    if (get >= upper)              /* cannot happen; keep */
-                        get -= size;               /* the waiter's bounds */
-                    engine_mem32_write(chan + ENGINE_PFIFO_CHAN_GET_OFF, get);
-                }
+            cursor = engine_mem32(dev) & 0x0FFFFFFFu;
+            if (base && upper > base + 0x8000u &&
+                cursor >= base && cursor < upper) {
+                engine_mem32_write(chan + ENGINE_PFIFO_CHAN_GET_OFF, cursor);
+            } else {
+                uint32_t cput = engine_mem32(chan + ENGINE_PFIFO_CHAN_PUT_OFF);
+                if (cput && engine_mem32(chan + ENGINE_PFIFO_CHAN_GET_OFF) != cput)
+                    engine_mem32_write(chan + ENGINE_PFIFO_CHAN_GET_OFF, cput);
             }
         }
     }
