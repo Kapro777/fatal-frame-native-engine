@@ -118,14 +118,35 @@ static void engine_mem32_write(uint32_t va, uint32_t v)
  *   chan = MEM32(dev + 0x23BC) the channel object (0x00800000 here)
  * A zero or wild pointer means the channel is not established yet, so
  * the polls are silent until device creation finishes storing it.
+ *
+ * There is a second, stricter handshake on the same object: the title's
+ * software FIFO submits one NV2A method per call through sub_000F1823
+ * and, when its write cursor (dev->[0], a VA inside the 512 KB
+ * contiguous window) reaches the sliding end (dev->[4]), it asks for
+ * room via sub_000EDED0 -> sub_000EDD50 -> sub_000EDD89. The gate
+ * there, from the XBE at 0x000EDE19..0x000EDE21, is
+ *
+ *     room  <=>  consumed >= cursor  ||  consumed > cursor + chunk
+ *     consumed = MEM32(chan + 0x44) | 0x80000000   (the channel GET,
+ *                bounds-checked against dev->[0x24]..dev->[0x28], else
+ *                the aperture GET at [dev->[0x4FC] + 0x324C])
+ *     chunk    = MEM32(0xFA320)       (the title's own ring chunk size)
+ *
+ * so the GPU-side maintenance this thread models is not "GET == PUT"
+ * (that reads as zero room and starves the waiter -- measured at
+ * exactly 2 dwords of space, forever) but "the consumer lags the
+ * writer by one chunk", which is the same handshake expressed the way
+ * the waiter measures it. All of the geometry is read from the device
+ * object at run time, so nothing about this title is baked in.
  */
 #define ENGINE_PFIFO_DEV_GLOBAL   0xF9B80u
 #define ENGINE_PFIFO_DEV_CHAN_OFF 0x23BCu
 #define ENGINE_PFIFO_CHAN_PUT_OFF 0x40u
 #define ENGINE_PFIFO_CHAN_GET_OFF 0x44u
 #define ENGINE_PFIFO_RAM_HI       0x04000000u  /* 64 MB guest window */
-#define ENGINE_PFIFO_RING_HEADROOM 0x00004000u /* the 16 KB the FIFO waiter */
-                                                /* demands before a method  */
+#define ENGINE_PFIFO_RING_BASE_OFF 0x24u       /* ring base VA (dev->[0x24]) */
+#define ENGINE_PFIFO_RING_END_OFF  0x28u       /* ring end VA  (dev->[0x28]) */
+#define ENGINE_PFIFO_CHUNK_GLOBAL  0xFA320u    /* ring chunk size (bytes) */
 
 static DWORD WINAPI engine_pfifo_ack_thread(LPVOID unused)
 {
@@ -140,52 +161,42 @@ static DWORD WINAPI engine_pfifo_ack_thread(LPVOID unused)
         chan = engine_mem32(dev + ENGINE_PFIFO_DEV_CHAN_OFF);
         if (chan < 0x10000u || chan >= ENGINE_PFIFO_RAM_HI)
             continue;                       /* channel not established yet */
-        /* (a) the channel's own PUT -- the library's flush updates this
-         * pair itself (dev->[0] & 0xFFFFFFF in both slots), so mirroring
-         * one to the other keeps GET == PUT between flushes. */
-        {
-            uint32_t cput = engine_mem32(chan + ENGINE_PFIFO_CHAN_PUT_OFF);
-            if (cput && engine_mem32(chan + ENGINE_PFIFO_CHAN_GET_OFF) != cput)
-                engine_mem32_write(chan + ENGINE_PFIFO_CHAN_GET_OFF, cput);
-        }
-        /* (b) the ring-space model. The title submits method words straight into
-         * its ring (advancing dev->[0] as a guest VA; the ring runs from
-         * dev->[0x24] to dev->[4], inside the contiguous window that
-         * dev->[0x28] bounds) and the ring-space waiter
-         * (sub_000EDD50, the software-FIFO path) computes the free space
-         * from the channel's consumed position, MEM32(chan+0x44). The
-         * title only folds its live cursor into that slot when it
-         * flushes, and this title never reaches its own flush -- so on
-         * hardware the GPU's DMA engine is what advances it.
+        /* The ring-space model. The title writes method words into its ring,
+         * advancing dev->[0] as a guest VA, and only folds that cursor into
+         * the channel pair when it flushes -- which it never reaches while
+         * the waiter starves. On hardware the GPU's DMA engine advances the
+         * consumed position (chan->[0x44]) as it reads the ring, and the
+         * waiter measures room as "consumed is a chunk ahead of the cursor"
+         * (see the gate quoted in the comment above).
          *
-         * The waiter's space is (GET - PUT) mod ring_size, and it demands
-         * a 16 KB (0x4000) headroom before it will place a method, so a
-         * GET equal to the cursor (2 dwords of room, measured) still
-         * starves it. The model that answers both: the GPU lags the
-         * writer by one whole ring minus that headroom -- everything
-         * submitted is consumed (the D3D11 layer draws, exactly as the
-         * runtime's own ack thread argues) and there is always room for
-         * the headroom. The geometry is the device's own, so nothing is
-         * hardcoded and a mid-init or wild cursor is skipped. */
+         * The model: keep the consumer exactly one chunk behind the writer,
+         * so the room the waiter measures is (ring size - chunk) -- always
+         * more than the chunk it demands. Everything submitted is treated as
+         * consumed (the D3D11 layer draws, the same argument the runtime's
+         * own aperture ack thread makes for the USER window). Geometry and
+         * lag come from the device object and the title's own chunk global,
+         * so a mid-init or wild cursor is skipped rather than guessed at.
+         *
+         * The channel's PUT is deliberately left alone: mirroring PUT into
+         * GET (the library's own flush semantics) reads as zero room and is
+         * what starved this wait in the first place. */
         {
-            uint32_t base = engine_mem32(dev + 0x24) & 0x0FFFFFFFu;
-            uint32_t end  = engine_mem32(dev + 4)    & 0x0FFFFFFFu;
-            if (base && end > base + 0x8000u) {     /* a real ring, not noise */
-                uint32_t size = end - base;
-                uint32_t want = base + ENGINE_PFIFO_RING_HEADROOM;
-                if (want < end) {
-                    cursor = engine_mem32(dev) & 0x0FFFFFFFu;
-                    if (cursor >= base && cursor <= end) {
-                        /* keep GET an entire ring behind the writer, so
-                         * (GET - PUT) mod size == size - headroom */
-                        uint32_t get = cursor + size - ENGINE_PFIFO_RING_HEADROOM;
-                        if (get > end)
-                            get -= size;
-                        if (get < base)
-                            get = base;
-                        engine_mem32_write(chan + ENGINE_PFIFO_CHAN_GET_OFF,
-                                          get);
-                    }
+            uint32_t base  = engine_mem32(dev + ENGINE_PFIFO_RING_BASE_OFF)
+                             & 0x0FFFFFFFu;
+            uint32_t upper = engine_mem32(dev + ENGINE_PFIFO_RING_END_OFF)
+                             & 0x0FFFFFFFu;
+            if (base && upper > base + 0x8000u) {   /* a real ring, not noise */
+                uint32_t size = upper - base;
+                uint32_t lag  = engine_mem32(ENGINE_PFIFO_CHUNK_GLOBAL);
+                if (lag == 0u || lag >= size / 2u)  /* a sane backlog */
+                    lag = size / 4u;
+                cursor = engine_mem32(dev) & 0x0FFFFFFFu;
+                if (cursor >= base && cursor < upper) {
+                    uint32_t get = base +
+                        ((cursor - base + size - lag) % size);
+                    if (get >= upper)              /* cannot happen; keep */
+                        get -= size;               /* the waiter's bounds */
+                    engine_mem32_write(chan + ENGINE_PFIFO_CHAN_GET_OFF, get);
                 }
             }
         }
