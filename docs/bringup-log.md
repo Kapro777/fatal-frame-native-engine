@@ -337,10 +337,86 @@ from the run's log or the XBE):
   slot), and the ring-space lag model in `engine_pfifo_ack_thread`
   (kept; it is the honest "submitted = consumed" statement and harmless).
 
-**Conclusion**: the wait has several independent gates (the channel GET,
-the context reservation pair, possibly an aperture fallback), and this
-title's software FIFO expects the GPU-side maintenance of all of them.
-Unblocking it means modelling that maintenance — the pushbuffer/FIFO
-consumption work of the graphics phase, not a one-line fix. The engine is
-left in its last green state; the trail above is what the next engineer
-(or agent) should start from.
+### 2026-11-18 — the waiter's gate, derived from the XBE (root cause)
+
+The whole software-FIFO wait was disassembled from the on-disk XBE
+(`tools/bringup/xbe_tools.py`, verified byte-for-byte against the file,
+delta `VA - 0xFB80`) and compared with the generated C: **the generated
+code matches the XBE 1:1 — there is no recompiler gap on this path.**
+The functions and what they do:
+
+* `sub_000EDED0` is a two-line wrapper: it calls
+  `sub_000EDD50(MEM32(0xFA320) >> 1, MEM32(0xFA320))` — i.e.
+  (half-chunk, chunk).
+* `sub_000EDD50` first tests `dev[8] & 4`. When that bit is set it takes
+  the hardware path: the consumed position comes from
+  `dev->[0x350] -> [ +4]`, and `dev->[0]` is pulled to it. This title
+  never sets the bit, so it always takes the software path at
+  `sub_000EDD89`.
+* `sub_000EDD89` computes the consumed position the waiter uses:
+  `eax = MEM32(MEM32(dev+0x23BC) + 0x44) | 0x80000000` (the channel
+  GET), bounds-checked against the ring `dev->[0x24]..dev->[0x28]`; if
+  it falls outside, the fallback is
+  `MEM32(MEM32(dev+0x4FC) + 0x324C) & ~1 | 0x80000000` (the aperture's
+  own PFIFO GET). It then decides wrap vs no-wrap against
+  `dev->[0x28]` (with the title's chunk plus a 0x4000 margin) and, on
+  a wrap, writes the ring marker at the cursor and sets `dev->[0]` back
+  to the ring base.
+* **`sub_000EDE19` is the gate** (0x000EDE19..0x000EDE21):
+
+      room  <=>  cursor >= consumed   ||   consumed > cursor + chunk
+      consumed = the channel GET (or the aperture fallback), as a VA
+      chunk    = MEM32(0xFA320)       (0x8000 bytes here)
+      cursor   = dev->[0]
+
+  Only when neither holds does it take the deferred-submission wait at
+  0x000EDE23 (the dirty table at `dev->[0x4C]`, `sub_000EDC10`
+  submissions) and slide `dev->[4]` to the new end. The function then
+  returns and the submitter retries the next method.
+
+**Measured at the stall** (`RECOMP_PEEK`, with `RECOMP_PB_EXEC=1
+RECOMP_PB_REPORT_MS=2000`):
+`cursor=0x80002998 dev[0x24]=0x80002000 dev[0x28]=0x80082000
+dev[4]=0x8000A794 chanPUT=0x2000 chanGET=0x712C`.
+Ring geometry: base 0x2000, end 0x82000, size 0x80000 (512 KB); the
+demanded headroom is 0x8000. The channel GET of 0x712C leaves
+0x712C - 0x2998 = 0x4794 bytes — short of the 0x8000 the gate demands,
+which is why every probe reported "no room".
+
+**Why each earlier fix missed** (all now explained by the gate):
+* mirroring PUT into GET (the library's flush semantics) gives
+  GET == cursor, i.e. zero room — worse than nothing;
+* mirroring the cursor into GET has the same effect;
+* the "ring-lag" model used `dev->[4]` as the ring end — but `dev->[4]`
+  is the *sliding* end the waiter itself rewrites each call
+  (`cursor + chunk - 0x204`), not the geometry — and a hardcoded
+  0x4000 headroom, so it produced 0x4794 bytes of room, still short.
+
+**Correction to an earlier note**: the device context pair at
+`dev->[0x34]` (guest 0x80001000) is *not* a gate on this path. In
+`sub_000EDD89` its first dword is read into a stack slot
+(`mov [esp+0x10], edx` at 0x000EDD9F) and never used again; nothing
+compares it against `[context+4]` here. (`context[4]` really is never
+written anywhere in the XBE — but on this path nothing reads it
+either.) The pokes aimed at it could not have worked, and did not.
+
+**The fix** (engine, `src/main.c`, `engine_pfifo_ack_thread`): model the
+GPU-side consumption the way the gate measures it — keep the consumed
+position exactly one chunk behind the writer,
+
+    GET = base + ((cursor - base + ring_size - chunk) mod ring_size)
+
+with `base = dev->[0x24]`, `ring_size = dev->[0x28] - dev->[0x24]` and
+`chunk = MEM32(0xFA320)` (all read at run time, clamped to a sane
+backlog, skipped when the cursor is outside the ring). Then the room
+the gate measures is `ring_size - chunk`, always more than the chunk it
+demands, in every region of the ring: when the cursor is near the ring
+base the GET is ahead (second clause), and once the writer is more than
+a chunk past the base the GET has wrapped behind it (first clause) —
+hand-verified for all three branches of `sub_000EDD89`'s wrap decision.
+The channel PUT is deliberately left alone now: mirroring it into GET is
+what starved the wait.
+
+**Conclusion**: the wait has one gate, not several: the channel GET
+versus `cursor + chunk`. The context pair and the 0xF9B84 gate were
+red herrings for this deadlock.
